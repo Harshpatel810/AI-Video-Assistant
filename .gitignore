@@ -1,0 +1,96 @@
+# ==============================================================================
+# Git Ignore for Video AI Assistant
+# ==============================================================================
+
+# --- Environment & Sensitive Credentials ---
+.env
+.env.*
+!.env.example
+*.env
+.streamlit/secrets.toml
+
+# --- Python Virtual Environments ---
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# --- Python Bytecode & Cache ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.so
+.Python
+
+# --- Project-Specific Media & Audio/Video Files ---
+# Downloaded / processed audio and video files
+downloades/
+downloads/
+temp/
+tmp/
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.flv
+*.wmv
+*.webm
+*.wav
+*.mp3
+*.m4a
+*.aac
+*.ogg
+*.flac
+*_converted.wav
+*_chunk_*.wav
+
+# --- Vector Database & AI / ML Model Artifacts ---
+vector_db/
+chroma/
+chroma_db/
+*.sqlite3
+*.chroma
+.cache/
+models/
+checkpoints/
+*.pt
+*.bin
+*.safetensors
+*.onnx
+
+# --- Streamlit & Web Cache ---
+.streamlit/cache/
+
+# --- Testing & Code Coverage ---
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# --- IDEs & System Files ---
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# Operating System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Logs & Debugging
+*.log

@@ -1,0 +1,36 @@
+# AI Meeting Assistant - Python 3.12.x
+# System dependency (not pip): FFmpeg must be installed and on PATH
+
+# UI
+streamlit>=1.40,<2.0
+
+# Audio download (YouTube) 
+yt-dlp>=2025.1.1
+
+# Local transcription: Whisper (English) & SraVaani-1.0 (Hinglish/Indic)
+openai-whisper>=20240930
+torch>=2.5
+numpy>=1.26
+transformers>=4.40.0
+soundfile>=0.12.0
+accelerate>=0.26.0
+
+# LangChain (LCEL) + Mistral
+langchain>=0.3,<2.0
+langchain-core>=0.3,<2.0
+langchain-community>=0.3,<2.0
+langchain-text-splitters>=0.3,<2.0
+langchain-mistralai>=0.2
+mistralai>=1.0
+
+# RAG: ChromaDB + HuggingFace embeddings
+chromadb>=0.5.5
+langchain-chroma>=0.1.4
+langchain-huggingface>=0.1
+sentence-transformers>=3.0
+
+# Export (PDF / TXT)
+fpdf2>=2.8
+
+# Config
+python-dotenv>=1.0
