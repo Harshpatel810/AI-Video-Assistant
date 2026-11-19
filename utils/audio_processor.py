@@ -70,7 +70,7 @@ def chunk_audio(wav_path: str, chunk_minutes: int = 10) -> list:
     
     return chunks
 
-def process_input(source: str) -> list:
+def process_input(source: str, return_master_wav: bool = False):
     source = source.strip().strip('"').strip("'")
     if not source:
         raise ValueError("No video URL or file path provided.")
@@ -87,4 +87,7 @@ def process_input(source: str) -> list:
     print("Chunking audio...")
     chunks = chunk_audio(wav_path)
     print(f"Audio ready — {len(chunks)} chunk(s) created.")
+    
+    if return_master_wav:
+        return wav_path, chunks
     return chunks

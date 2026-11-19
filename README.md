@@ -92,7 +92,7 @@ flowchart TD
 | **Deep Learning** | PyTorch | ≥ 2.5 | Backend for Whisper & SraVaani |
 | **Model Loading** | Transformers (HF) | ≥ 4.40 | Load SraVaani via `AutoModel` |
 | **LLM** | OpenRouter → `nvidia/nemotron-3.5-super-vl:free` | — | Summarization, extraction, RAG answers |
-| **LLM Framework** | LangChain LCEL | ≥ 0.3 | Chains, prompts, output parsers |
+| **LLM Framework** | LangChain LCEL | ≥ 0.3 | Chains, prompts, output parsers |  
 | **Embeddings** | `paraphrase-multilingual-MiniLM-L12-v2` | sentence-transformers ≥ 3.0 | Multilingual semantic embeddings (50+ langs) |
 | **Vector DB** | ChromaDB | ≥ 0.5.5 | Local persistent vector store |
 | **PDF Export** | fpdf2 | ≥ 2.8 | Export transcripts & summaries to PDF |

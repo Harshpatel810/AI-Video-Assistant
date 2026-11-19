@@ -13,16 +13,17 @@ from core.transcriber import transcribe_all
 from core.summarizer import summarize, generate_title
 from core.extractor import extract_action_items, extract_key_decisions, extract_questions
 from core.rag_engine import build_rag_chain, ask_question
+from core.database import save_meeting
 
 
 load_dotenv()
 
-def run_pipeline(source :str, language :str = "english") -> dict:
+def run_pipeline(source: str, language: str = "english", save_to_db: bool = True) -> dict:
     print("starting AI Video Assistant")
 
-    chunks = process_input(source)
+    wav_path, chunks = process_input(source, return_master_wav=True)
 
-    transcript = transcribe_all(chunks,language)
+    transcript = transcribe_all(chunks, language)
     print(f"raw transcription (first 300 characters ) {transcript[:300]}")
 
     title = generate_title(transcript)
@@ -36,7 +37,26 @@ def run_pipeline(source :str, language :str = "english") -> dict:
     
     rag_chain = build_rag_chain(transcript)
 
+    meeting_id = None
+    if save_to_db:
+        try:
+            meeting_id = save_meeting(
+                transcript=transcript,
+                summary=summary,
+                audio_path=wav_path,
+                title=title,
+                source=source,
+                language=language,
+                action_items=action_item,
+                key_decisions=decisions,
+                open_questions=questions,
+            )
+            print(f"Session saved to SQLite database with ID: {meeting_id}")
+        except Exception as e:
+            print(f"Warning: Failed to save to database: {e}")
+
     return {
+        "id": meeting_id,
         "title": title,
         "transcript": transcript,
         "summary": summary,
@@ -44,6 +64,7 @@ def run_pipeline(source :str, language :str = "english") -> dict:
         "key_decisions": decisions,
         "open_questions": questions,
         "rag_chain": rag_chain,
+        "audio_path": wav_path,
     }
 
 if __name__ == "__main__":
@@ -54,6 +75,8 @@ if __name__ == "__main__":
 
     print("\n" + "=" * 60)
     print(f"📌 Title: {result['title']}")
+    if result.get("id"):
+        print(f"💾 Saved in SQLite (Record #{result['id']})")
     print(f"\n📋 Summary:\n{result['summary']}")
     print(f"\n✅ Action Items:\n{result['action_items']}")
     print(f"\n🔑 Key Decisions:\n{result['key_decisions']}")

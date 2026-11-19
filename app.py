@@ -11,6 +11,7 @@ from core.transcriber import transcribe_all
 from core.summarizer import summarize, generate_title
 from core.extractor import extract_action_items, extract_key_decisions, extract_questions
 from core.rag_engine import build_rag_chain, ask_question
+from core.database import save_meeting, get_all_meetings, get_meeting
 
 load_dotenv()
 
@@ -360,6 +361,19 @@ with st.sidebar:
         ]:
             render_step_bar(label, step, icon)
 
+    st.markdown("---")
+    with st.expander("📚 Saved Sessions History", expanded=False):
+        try:
+            saved_list = get_all_meetings(limit=10)
+            if saved_list:
+                for item in saved_list:
+                    st.markdown(f"**#{item['id']} {item['title']}**")
+                    st.caption(f"{item['created_at']} · {item['language']}")
+            else:
+                st.caption("No saved meetings yet.")
+        except Exception:
+            st.caption("Database not initialized yet.")
+
 # ─── Main Area ──────────────────────────────────────────────────────────────────
 st.markdown('<div class="hero-title">AI Video Assistant</div>', unsafe_allow_html=True)
 st.markdown('<div class="hero-sub">Transcribe · Summarise · Chat with your meetings</div>', unsafe_allow_html=True)
@@ -385,7 +399,7 @@ if run_btn:
                 st.info("⚙️ Pipeline running — see sidebar for live status…")
 
             update_step("audio", "active")
-            chunks = process_input(source)
+            wav_path, chunks = process_input(source, return_master_wav=True)
             update_step("audio", "done")
 
             update_step("transcript", "active")
@@ -410,7 +424,25 @@ if run_btn:
             rag_chain = build_rag_chain(transcript)
             update_step("rag", "done")
 
+            # Save session (transcript, summary, and WAV audio) to SQLite
+            meeting_id = None
+            try:
+                meeting_id = save_meeting(
+                    transcript=transcript,
+                    summary=summary,
+                    audio_path=wav_path,
+                    title=title,
+                    source=source,
+                    language=language,
+                    action_items=action_items,
+                    key_decisions=decisions,
+                    open_questions=questions,
+                )
+            except Exception as db_err:
+                print(f"Warning: Failed to save to database: {db_err}")
+
             st.session_state.result = {
+                "id": meeting_id,
                 "title": title,
                 "transcript": transcript,
                 "summary": summary,
@@ -418,6 +450,7 @@ if run_btn:
                 "key_decisions": decisions,
                 "open_questions": questions,
                 "rag_chain": rag_chain,
+                "audio_path": wav_path,
             }
             st.session_state.pipeline_done = True
             progress_placeholder.success("✅ Analysis complete!")
@@ -436,13 +469,18 @@ if st.session_state.result:
     r = st.session_state.result
 
     # Title banner
+    db_badge = f"<span class='badge badge-cyan' style='margin-left:0.75rem'>💾 Stored in SQLite #{r['id']}</span>" if r.get("id") else ""
     st.markdown(f"""
     <div class="card">
-        <div class="card-title">📌 Session Title</div>
+        <div class="card-title">📌 Session Title {db_badge}</div>
         <div style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:700;color:var(--text)">
             {r['title']}
         </div>
     </div>""", unsafe_allow_html=True)
+
+    if r.get("audio_path") and os.path.exists(r["audio_path"]):
+        with st.expander("🔊 Audio Player (WAV)", expanded=False):
+            st.audio(r["audio_path"], format="audio/wav")
 
     # Top row: summary + transcript
     col1, col2 = st.columns([3, 2], gap="medium")

@@ -4,11 +4,12 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.runnables import RunnablePassthrough, RunnableLambda
+from langchain_groq import ChatGroq
 
 import os 
 
 def get_llm():
-    return ChatOpenRouter(model = "nvidia/nemotron-3.5-super-vl:free", openrouter_api_key = os.getenv("OPENROUTER_API_KEY"),temperature=0.3)
+    return  ChatOpenRouter(model = "nvidia/nemotron-3.5-super-vl:free", openrouter_api_key = os.getenv("OPENROUTER_API_KEY"),temperature=0.3)
 
 
 def split_transcript(transcript: str) -> list:
@@ -44,7 +45,7 @@ def summarize(transcript : str) -> str:
             "You are an expert meeting summarizer. Combine these partial summaries "
             "into one final professional meeting summary in bullet points.",
         ),
-        ("human", "{text}"),
+        ("human", "{text}"), 
     ]
     )
 

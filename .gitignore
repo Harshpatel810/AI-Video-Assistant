@@ -52,6 +52,8 @@ tmp/
 vector_db/
 chroma/
 chroma_db/
+*.db
+*.sqlite
 *.sqlite3
 *.chroma
 .cache/
